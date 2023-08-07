@@ -1,0 +1,28 @@
+.but{
+    color:#B0B8BF !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+.but2 .btn-group{
+    width: 100% !important;
+}
+
+.uploadbut{
+    width: 50%;
+}
+.uploadbut span {
+  display: flex;
+  justify-content: center;
+  font-size: 39px;
+  align-items: center;
+}
+
+@media screen and (max-width:500px) {
+    .uploadbut{
+    width: 100%;
+}
+.uploadbut span{
+    font-size: 22px;
+}
+
+}
