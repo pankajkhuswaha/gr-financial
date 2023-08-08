@@ -21,7 +21,7 @@ const initialState = {
       propertyDetails: [],
       carDetails: [],
       providentfund: "",
-      cashInHand: "",
+      cashinhand: "",
     },
     documents: {},
     document: [],
@@ -54,7 +54,7 @@ const loanSlice = createSlice({
     },
     addasset: (state, action) => {
       state.data.assetdetail.providentfund = action.payload.profitentfund;
-      state.data.assetdetail.cashInHand = action.payload.cashinhand;
+      state.data.assetdetail.cashinhand = action.payload.cashinhand;
     },
     addDocument: (state, action) => {
       state.data.documents = action.payload;
@@ -74,6 +74,9 @@ const loanSlice = createSlice({
     toggleSearch: (state, action) => {
       state.filterdata = action.payload;
     },
+    resetData:(state,action)=>{
+      Object.assign(state, initialState);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -107,6 +110,7 @@ export const {
   addloanType,
   toggleFilter,
   toggleSearch,
+  resetData
 } = loanSlice.actions;
 
 export default loanSlice.reducer;

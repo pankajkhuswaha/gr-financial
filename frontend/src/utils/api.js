@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 export const uploadDoc = (data) => {
   return new Promise((resolve, reject) => {
     const file = data;
-    const fileAdress = ref(storage, `finance/${data.name}.pdf`);
+    const fileAdress = ref(storage, `finance/${data.name}`);
     const uploadTask = uploadBytesResumable(fileAdress, file);
 
     uploadTask.on(
@@ -57,12 +57,17 @@ export const getAllCustomer = async () => {
   return response.data;
 };
 
-export const deleteCustomer = async () => {
-  const response = await axios.delete(`${base_url}customer`,config);
+export const deleteCustomer = async (data) => {
+  console.log(config)
+  const response = await axios.delete(`${base_url}customer/${data._id}`,config);
   return response.data;
 };
 
 export const addCustomer = async (data) => {
   const response = await axios.post(`${base_url}customer/add`, data, config);
+  return response.data;
+};
+export const updateCustomer = async (data) => {
+  const response = await axios.put(`${base_url}customer`, data, config);
   return response.data;
 };

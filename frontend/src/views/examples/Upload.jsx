@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "./index.css";
@@ -16,9 +16,9 @@ import {
 } from "reactstrap";
 import { uploadDoc } from "utils/api";
 import { addDocument } from "features/loan/loanSlice";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { addCustomer } from "utils/api";
+import { resetData } from "features/loan/loanSlice";
 
 const Upload = ({ direction, ...args }) => {
   const dispatch = useDispatch();
@@ -39,14 +39,15 @@ const Upload = ({ direction, ...args }) => {
     form16: "",
   });
   const data = useSelector((st) => st.customer.data);
-  // console.log(data)
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const merge = { ...data, documents: docData };
     try {
-      const res = await addCustomer(data)
+      const res = await addCustomer(merge);
+      dispatch(resetData());
+      navigate("/admin/index");
       toast.success(res.data);
-      navigate("/admin/index")
     } catch (error) {
       toast.error(error.message);
     }
@@ -55,101 +56,47 @@ const Upload = ({ direction, ...args }) => {
   const handleDocUpload = async (e, field) => {
     e.preventDefault();
     let url;
-    switch (field) {
-      case "adr":
-        url = await uploadDoc(docData.addhaarCard);
-        setDocData({ ...docData, addhaarCard: url });
-        if (url) {
-          toast.success("Addhaar Card uploaded Sucessfully");
-        } else {
-          toast.error("Addhaar Card upload failed !");
+    const file = e.target.files[0];
+    try {
+      url = await uploadDoc(file);
+
+      if (url.includes("http")) {
+        switch (field) {
+          case "adr":
+            setDocData({ ...docData, addhaarCard: url });
+            break;
+          case "pan":
+            setDocData({ ...docData, PanCard: url });
+            break;
+          case "ayfirst":
+            setDocData({ ...docData, ayFirstYear: url });
+            break;
+          case "aysecond":
+            setDocData({ ...docData, aySecondYear: url });
+            break;
+          case "aythird":
+            setDocData({ ...docData, ayThirdYear: url });
+            break;
+          case "loan":
+            setDocData({ ...docData, loanSchedle: url });
+            break;
+          case "propaper":
+            setDocData({ ...docData, propertyPaper: url });
+            break;
+          case "banking":
+            setDocData({ ...docData, banking: url });
+            break;
+          case "salary":
+            setDocData({ ...docData, salarySlip: url });
+            break;
+          case "form16":
+            setDocData({ ...docData, form16: url });
+            break;
+          default:
+            break;
         }
-        break;
-      case "pan":
-        url = await uploadDoc(docData.PanCard);
-        setDocData({ ...docData, PanCard: url });
-        if (url) {
-          toast.success("Pan Card uploaded Sucessfully");
-        } else {
-          toast.error("Pan Card upload failed !");
-        }
-        break;
-      case "ayfirst":
-        url = await uploadDoc(docData.ayFirstYear);
-        setDocData({ ...docData, ayFirstYear: url });
-        if (url) {
-          toast.success("AY First Year is uploaded Sucessfully");
-        } else {
-          toast.error("AY First Year upload failed !");
-        }
-        break;
-      case "aysecond":
-        url = await uploadDoc(docData.aySecondYear);
-        setDocData({ ...docData, aySecondYear: url });
-        if (url) {
-          toast.success("AY Second Year is uploaded Sucessfully");
-        } else {
-          toast.error("AY Second Year upload failed !");
-        }
-        break;
-      case "aythird":
-        url = await uploadDoc(docData.ayThirdYear);
-        setDocData({ ...docData, ayThirdYear: url });
-        if (url) {
-          toast.success("AY Third Year is uploaded Sucessfully");
-        } else {
-          toast.error("AY Third Year upload failed !");
-        }
-        break;
-      case "loan":
-        url = await uploadDoc(docData.loanSchedle);
-        setDocData({ ...docData, loanSchedle: url });
-        if (url) {
-          toast.success("Loan Scedule is uploaded Sucessfully");
-        } else {
-          toast.error("Loan Scedule upload failed !");
-        }
-        break;
-      case "propaper":
-        url = await uploadDoc(docData.propertyPaper);
-        setDocData({ ...docData, propertyPaper: url });
-        if (url) {
-          toast.success("Property Papers is uploaded Sucessfully");
-        } else {
-          toast.error("Property Papers upload failed !");
-        }
-        break;
-      case "banking":
-        url = await uploadDoc(docData.banking);
-        setDocData({ ...docData, banking: url });
-        if (url) {
-          toast.success("Banking is uploaded Sucessfully");
-        } else {
-          toast.error("Banking upload failed !");
-        }
-        break;
-      case "salary":
-        url = await uploadDoc(docData.salarySlip);
-        setDocData({ ...docData, salarySlip: url });
-        if (url) {
-          toast.success("Salary Slip is uploaded Sucessfully");
-        } else {
-          toast.error("Salary Slip upload failed !");
-        }
-        break;
-      case "form16":
-        url = await uploadDoc(docData.form16);
-        setDocData({ ...docData, form16: url });
-        if (url) {
-          toast.success("Form 16 is uploaded Sucessfully");
-        } else {
-          toast.error("Form 16 upload failed !");
-        }
-        break;
-      default:
-        break;
-    }
-    dispatch(addDocument(docData));
+      }
+    } catch (error) {}
   };
 
   return (
@@ -194,19 +141,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="aadharFile"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            addhaarCard: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "adr")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "adr")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
 
@@ -218,19 +154,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="panfile"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            PanCard: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "pan")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "pan")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                 </>
@@ -264,19 +189,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="ayfistYear"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            ayFirstYear: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "ayfirst")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "ayfirst")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -287,19 +201,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="aysecondYear"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            aySecondYear: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "aysecond")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "aysecond")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -310,19 +213,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="aythirdYear"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            ayThirdYear: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "aythird")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "aythird")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                 </>
@@ -357,19 +249,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="loanSchedule"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            loanSchedle: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "loan")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "loan")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -380,19 +261,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="propertyPapers"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            propertyPaper: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "propaper")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "propaper")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -403,19 +273,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="banking"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            banking: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "banking")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "banking")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -426,19 +285,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="salarySlip"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            salarySlip: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "salary")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "salary")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
@@ -449,19 +297,8 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="form16"
-                        onChange={(e) =>
-                          setDocData({
-                            ...docData,
-                            form16: e.target.files[0],
-                          })
-                        }
+                        onChange={(e) => handleDocUpload(e, "form16")}
                       />
-                      <button
-                        className="btn btn-primary col-3"
-                        onClick={(e) => handleDocUpload(e, "form16")}
-                      >
-                        Upload
-                      </button>
                     </InputGroup>
                   </FormGroup>
                 </>

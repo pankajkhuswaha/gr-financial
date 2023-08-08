@@ -3,6 +3,7 @@ const {
   addCustomer,
   getCustomerData,
   deleteCustomerData,
+  updateCustomer,
 } = require("../controller/customerCtrl");
 const {
   authMiddleware,
@@ -13,5 +14,6 @@ const {
 const router = express.Router();
 router.post("/add", authMiddleware, isAdmin, addCustomer);
 router.get("/", authMiddleware, isAdmin, getCustomerData);
-router.delete("/", authMiddleware, isAdmin,isSuper, deleteCustomerData);
+router.delete("/:id", authMiddleware, isAdmin,isSuper, deleteCustomerData);
+router.put("/", authMiddleware, isAdmin,isSuper, updateCustomer);
 module.exports = router;

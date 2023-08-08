@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {  Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./index.css";
 import {
   Button,
@@ -22,6 +22,8 @@ import {
 } from "reactstrap";
 import { addLoanDetailindvidual } from "features/loan/loanSlice";
 import { toast } from "react-toastify";
+import Select from "react-select";
+
 
 const Next = ({ direction, ...args }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -37,29 +39,38 @@ const Next = ({ direction, ...args }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = {loanType,loanAmount,rateOfInterest,tennuretime,dateOfDisburment}
-    if(loanType.length===0){
-      toast.info("Please Select atleast one type of loan")
-      return
+    const data = {
+      loanType,
+      loanAmount,
+      rateOfInterest,
+      tennuretime,
+      dateOfDisburment,
+    };
+    if (loanType.length === 0) {
+      toast.info("Please Select atleast one type of loan");
+      return;
     }
-    if(previousp.length!==0){
-      dispatch(addLoanDetailindvidual(data))
-      navigate("/AssetsDetail")
-    }else{
-      navigate("/admin")
-      toast.error("error Occured")
+    if (previousp.length !== 0) {
+      dispatch(addLoanDetailindvidual(data));
+      navigate("/AssetsDetail");
+    } else {
+      navigate("/admin");
+      toast.error("error Occured");
     }
   };
+  const [selectedOption, setSelectedOption] = useState();
+  const options = [
+    { value: "PL", label: "PL" },
+    { value: "BL", label: "BL" },
+    { value: "LAP", label: "LAP" },
+    { value: "HL", label: "HL" },
+    { value: "AL", label: "AL" },
+  ];
 
-  const handleLoanSelection = (loanTypes) => {
-    const selectedLoansCopy = [...loanType];
-    if (selectedLoansCopy.includes(loanTypes)) {
-      const index = selectedLoansCopy.indexOf(loanTypes);
-      selectedLoansCopy.splice(index, 1);
-    } else {
-      selectedLoansCopy.push(loanTypes);
-    }
-    setSelectedLoans(selectedLoansCopy);
+  const handleLoanSelection = (e) => {
+    setSelectedOption(e);
+    const opt = e.map((itm) => itm.value);
+    setSelectedLoans(opt);
   };
 
   return (
@@ -73,45 +84,16 @@ const Next = ({ direction, ...args }) => {
             <Form role="form" onSubmit={handleSubmit}>
               <Row>
                 <Col md="6">
-                  <FormGroup className="but2">
-                    <ButtonDropdown isOpen={dropdownOpen} toggle={toggle}>
-                      <DropdownToggle className="but" caret>
-                        Type of Loan
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem
-                          active={loanType.includes("PL")}
-                          onClick={() => handleLoanSelection("PL")}
-                        >
-                          PL
-                        </DropdownItem>
-                        <DropdownItem
-                          active={loanType.includes("BL")}
-                          onClick={() => handleLoanSelection("BL")}
-                        >
-                          BL
-                        </DropdownItem>
-                        <DropdownItem
-                          active={loanType.includes("LAP")}
-                          onClick={() => handleLoanSelection("LAP")}
-                        >
-                          LAP
-                        </DropdownItem>
-                        <DropdownItem
-                          active={loanType.includes("HL")}
-                          onClick={() => handleLoanSelection("HL")}
-                        >
-                          HL
-                        </DropdownItem>
-                        <DropdownItem
-                          active={loanType.includes("AL")}
-                          onClick={() => handleLoanSelection("AL")}
-                        >
-                          AL
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </ButtonDropdown>
+                  <FormGroup>
+                  <Select
+                      isMulti
+                      placeholder="Select Loan Type"
+                      defaultValue={selectedOption}
+                      onChange={handleLoanSelection}
+                      options={options}
+                    />
                   </FormGroup>
+                    
                 </Col>
                 <Col md="6">
                   <FormGroup>
@@ -199,7 +181,6 @@ const Next = ({ direction, ...args }) => {
                   Next
                 </Button>
               </div>
-              
             </Form>
           </CardBody>
         </Card>

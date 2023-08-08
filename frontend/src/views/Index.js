@@ -62,11 +62,16 @@ const Index = ({ direction, ...args }) => {
     dispatch(addviewCustomer(itm))
     navigate("/admin/view")
   }
+  const handleEdit = async(itm)=>{
+    dispatch(addviewCustomer(itm))
+    navigate("/admin/edit")
+  }
   const handleDelete = async(itm)=>{
     const _id =itm._id
     try {
       const res = await deleteCustomer({_id})
       toast.info(res)
+    dispatch(getallCustomerData());
     } catch (error) {
       toast.error(error.message)
     }
@@ -228,6 +233,7 @@ const Index = ({ direction, ...args }) => {
                             fontSize={22}
                             color="green"
                             style={{ cursor: "pointer" }}
+                            onClick={()=>handleEdit(itm)}
                           />
                           <AiFillDelete
                             fontSize={22}

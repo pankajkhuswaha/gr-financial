@@ -42,7 +42,7 @@ const Assetsdetails = ({ direction, ...args }) => {
     carName: "",
     modelNumber: "",
     insuredBy: "",
-    cardetails: "",
+    policy: "",
     policyRenewalMonth: "",
   });
 
@@ -65,7 +65,7 @@ const Assetsdetails = ({ direction, ...args }) => {
 
   const handleFileUpload =async (file) => {
     let url = await uploadDoc(file);
-    setCardetails({ ...cardetails, cardetails: url });
+    setCardetails({ ...cardetails, policy: url });
     if(url){
       toast.success("Policy is uploaded Sucessfully")
     }

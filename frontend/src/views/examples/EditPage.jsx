@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { MdDelete } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Select from "react-select";
+import { ToastContainer, toast } from "react-toastify";
+import { updateCustomer } from "utils/api";
 const EditPage = () => {
   const atview = useLocation().pathname.includes("edit");
   if (atview) {
@@ -10,87 +13,10 @@ const EditPage = () => {
     }
     // document.getElementById("navbar-main").style.display = "none";
   }
-  const handleUpdate = () => {
-    console.log(formdata);
-  };
-  const data = {
-    _id: "64c9135e366bc3d22554245b",
-    handleby: "admin",
-    customertype: "Individual",
-    customerid: "GRFinancial002",
-    persondetails: [
-      {
-        name: "Pankaj Kumar Shukla",
-        email: "dryishercs@gmail.com",
-        city: "NIT",
-        address: "5E-12BP, 2nd Floor, NIT",
-        pincode: "121001",
-        state: "Delhi",
-        mobile: "07982658211",
-        dob: "2023-08-03",
-        mother: "nskf",
-        father: "sdfsdfsd",
-      },
-      {
-        name: "Manoj Kumar Shukla",
-        email: "pankaj@gmail.com",
-        city: "NIT",
-        address: "5E-12BP, 2nd Floor, NIT",
-        pincode: "121001",
-        state: "Delhi",
-        mobile: "07982658211",
-        dob: "2023-08-03",
-        mother: "nskf",
-        father: "sdfsdfsd",
-      },
-    ],
-    ref1: "fsdfsdf",
-    ref2: "sfsdf",
-    loantype: ["PL", "BL"],
-    loanAmount: "80000",
-    rateOfInterest: "10",
-    tennuretime: "15",
-    dateOfDisburment: "2023-08-02",
-    providentfund: "12",
-    documents: [{}],
-    cardetails: [
-      {
-        carName: "dfdfg",
-        modelNumber: "gfdgdfg",
-        insuredBy: "gdfgfd",
-        cardetails: "dffggdf",
-        policyRenewalMonth: "fdgdf",
-        policy: "454545",
-      },
-    ],
-    propertydeatils: [
-      {
-        propertyName: "fgdg",
-        propertyDetail: "dfgdfg",
-        propertyType: "dfgdfg",
-        propertyAddress: "dfgdfgdfg",
-      },
-    ],
-    firm: [
-      {
-        name: "fdf",
-        type: "fd",
-        adress: "ffdf",
-      },
-    ],
-    company: [
-      {
-        name: "company name",
-        type: "compny type",
-        adress: "adererer",
-      },
-    ],
-    cashinhand: "ddfd",
-    date: "2023-08-01T14:14:54.000Z",
-    createdAt: "2023-08-01T14:14:54.867Z",
-    updatedAt: "2023-08-01T14:14:54.867Z",
-    __v: 0,
-  };
+
+ 
+
+  const data = useSelector((st) => st.view.data);
   const [formdata, setformdata] = useState(data);
   const prevtype = formdata.loantype.map((itm) => ({ value: itm, label: itm }));
   const [selectedOption, setSelectedOption] = useState(prevtype);
@@ -101,9 +27,68 @@ const EditPage = () => {
     { value: "HL", label: "HL" },
     { value: "AL", label: "AL" },
   ];
+  const handleLoanType = (e) => {
+    setSelectedOption(e);
+    const opt = e.map((itm) => itm.value);
+    setformdata({ ...formdata, loantype: opt });
+  };
+  const handleaddnewCar = (e) => {
+    e.preventDefault();
+    const newCar = {
+      carName: "",
+      modelNumber: "",
+      insuredBy: "",
+      cardetails: "",
+      policyRenewalMonth: "",
+      policy: "",
+    };
+    formdata.cardetails.push(newCar);
+    setformdata({ ...formdata, cardetails: formdata.cardetails });
+  };
+  const handleCardelte = (i) => {
+    formdata.cardetails.splice(i, 1);
+    setformdata({ ...formdata, cardetails: formdata.cardetails });
+  };
+  const handleaddnewproperty = (e) => {
+    e.preventDefault();
+    const newproperty = {
+      propertyName: "",
+      propertyDetail: "",
+      propertyType: "",
+      propertyAddress: "",
+    };
+    formdata.propertydeatils.push(newproperty);
+    setformdata({ ...formdata, propertydeatils: formdata.propertydeatils });
+  };
+  const handlepropertydelte = (i) => {
+    formdata.propertydeatils.splice(i, 1);
+    setformdata({ ...formdata, propertydeatils: formdata.propertydeatils });
+  };
+  const buttonStyle = {
+    position: "absolute",
+    top: "78%",
+    right: 0,
+    border: "1px solid red",
+    borderRadius: "22px",
+    fontSize: "20px",
+    cursor: "pointer",
+    padding: "0px 7px",
+  };
+    const navigate = useNavigate()
+   const handleUpdate = async(e) => {
+    e.preventDefault();
+    try {
+      const res = await updateCustomer(formdata);
+      toast.success(res.message)
+      navigate("/admin/index")
+    } catch (error) {
+      toast.error(error.response.data.error)
+    }
+  };
 
   return (
     <>
+    <ToastContainer/>
       <div className="col-12 p-4">
         <p
           className="text-xl col-12 text-center mb-0 pb-0"
@@ -114,7 +99,7 @@ const EditPage = () => {
         <hr className="m-0 mb-2" />
         <form className="bg-white p-4 border shadow">
           <div className="row">
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Customer ID :</label>
               <input
                 type="text"
@@ -123,7 +108,7 @@ const EditPage = () => {
                 value={formdata.customerid}
               />
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Customer Type :</label>
               <input
                 type="text"
@@ -133,8 +118,8 @@ const EditPage = () => {
                 readOnly
               />
             </div>
-            <div className="col-4 mb-2">
-              <label className="mb-0"> Customer Handled By :</label>
+            <div className="col-6 col-md-4 mb-2">
+              <label className="mb-0">Customer handle By :</label>
               <input
                 type="text"
                 className="form-control"
@@ -147,7 +132,7 @@ const EditPage = () => {
               {" "}
               Loan Details
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Loan Ammount :</label>
               <input
                 type="number"
@@ -155,11 +140,11 @@ const EditPage = () => {
                 className="form-control"
                 value={formdata.loanAmount}
                 onChange={(e) =>
-                    setformdata({ ...formdata, loanAmount: e.target.value })
-                  }
+                  setformdata({ ...formdata, loanAmount: e.target.value })
+                }
               />
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Rate of Interest :</label>
               <input
                 type="number"
@@ -171,7 +156,7 @@ const EditPage = () => {
                 }
               />
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Date of Disbursement :</label>
               <input
                 type="date"
@@ -183,12 +168,12 @@ const EditPage = () => {
                 }
               />
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Type of Loan :</label>
               <Select
                 isMulti
                 defaultValue={selectedOption}
-                onChange={setSelectedOption}
+                onChange={handleLoanType}
                 options={options}
               />
             </div>
@@ -197,9 +182,9 @@ const EditPage = () => {
               {" "}
               Person Details
             </div>
-            {data.persondetails?.map((it, i) => (
-              <div className="col-12 row border-bottom mb-2">
-                <div className="col-4 mb-2">
+            {formdata.persondetails?.map((it, i) => (
+              <div key={i} className="col-12 row border-bottom mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Name :</label>
                   <input
                     type="text"
@@ -219,7 +204,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Email :</label>
                   <input
                     type="email"
@@ -239,7 +224,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Mobile Number :</label>
                   <input
                     type="text"
@@ -259,7 +244,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Date of Birth :</label>
                   <input
                     type="date"
@@ -279,7 +264,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Mother Name :</label>
                   <input
                     type="text"
@@ -299,7 +284,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Father Name :</label>
                   <input
                     type="text"
@@ -319,7 +304,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Address :</label>
                   <input
                     type="text"
@@ -339,7 +324,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> State :</label>
                   <input
                     type="text"
@@ -359,7 +344,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> City :</label>
                   <input
                     type="text"
@@ -379,7 +364,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Pincode :</label>
                   <input
                     type="text"
@@ -402,14 +387,14 @@ const EditPage = () => {
               </div>
             ))}
             {/* firmdetails deatils columns */}
-            {data.firm[0]?.name &&
-              data.firm?.map((it, i) => (
+            {formdata.firm[0]?.name &&
+              formdata.firm?.map((it, i) => (
                 <div className="col-12 row mb-2">
                   <div className="col-12 mt-2 text-lg text-center bg-light border rounded text-black mb-2">
                     {" "}
                     Firm Details
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Firm Name :</label>
                     <input
                       type="text"
@@ -429,7 +414,7 @@ const EditPage = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Firm type :</label>
                     <input
                       type="text"
@@ -449,7 +434,7 @@ const EditPage = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Firm address :</label>
                     <input
                       type="text"
@@ -472,14 +457,14 @@ const EditPage = () => {
                 </div>
               ))}
             {/* Company deatils columns */}
-            {data.company[0]?.name &&
-              data.company?.map((it, i) => (
+            {formdata.company[0]?.name &&
+              formdata.company?.map((it, i) => (
                 <div className="col-12 row mb-2">
                   <div className="col-12 mt-2 text-lg text-center bg-light border rounded text-black mb-2">
                     {" "}
                     Company Details
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Company Name :</label>
                     <input
                       type="text"
@@ -499,7 +484,7 @@ const EditPage = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Company type :</label>
                     <input
                       type="text"
@@ -519,7 +504,7 @@ const EditPage = () => {
                       }}
                     />
                   </div>
-                  <div className="col-4 mb-2">
+                  <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Company address :</label>
                     <input
                       type="text"
@@ -571,13 +556,14 @@ const EditPage = () => {
               />
             </div>
             {/* car deatils columns */}
-            {data.cardetails?.map((it, i) => (
+            {formdata.cardetails?.map((it, i) => (
               <div className="col-12 row mb-2">
                 <div className="col-12 mt-2 text-lg text-center text-black mb-2">
                   {" "}
                   Car Details
                 </div>
-                <div className="col-4 mb-2">
+
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Car Name :</label>
                   <input
                     type="text"
@@ -597,7 +583,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Model Number :</label>
                   <input
                     type="text"
@@ -617,7 +603,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Insured By :</label>
                   <input
                     type="text"
@@ -637,7 +623,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Car Details :</label>
                   <input
                     type="text"
@@ -657,7 +643,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Policy Renewal Date :</label>
                   <input
                     type="text"
@@ -677,7 +663,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Policy :</label>
                   <input
                     type="text"
@@ -697,16 +683,29 @@ const EditPage = () => {
                     }}
                   />
                 </div>
+                <p style={buttonStyle} onClick={() => handleCardelte(i)}>
+                  <MdDelete color="red" />
+                </p>
               </div>
             ))}
+            <button
+              className="btn btn-outline-dark"
+              style={{ marginLeft: 16 }}
+              onClick={handleaddnewCar}
+            >
+              Add new car
+            </button>
             {/* property deatils columns */}
-            {data.propertydeatils?.map((it, i) => (
+            {formdata.propertydeatils?.map((it, i) => (
               <div className="col-12 row mb-2">
+                <p style={buttonStyle} onClick={handlepropertydelte}>
+                  <MdDelete color="red" />
+                </p>
                 <div className="col-12 mt-2 text-lg text-center text-black mb-2">
                   {" "}
-                  Property Details
+                  Property Details {i + 1}
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Property Name :</label>
                   <input
                     type="text"
@@ -726,7 +725,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Propert Details :</label>
                   <input
                     type="text"
@@ -746,7 +745,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Property Type :</label>
                   <input
                     type="text"
@@ -766,7 +765,7 @@ const EditPage = () => {
                     }}
                   />
                 </div>
-                <div className="col-4 mb-2">
+                <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Property Address :</label>
                   <input
                     type="text"
@@ -788,11 +787,19 @@ const EditPage = () => {
                 </div>
               </div>
             ))}
+            <button
+              className="btn btn-outline-dark"
+              style={{ marginLeft: 16 }}
+              onClick={handleaddnewproperty}
+            >
+              Add new property
+            </button>
+
             <div className="col-12 mt-2 text-lg text-center bg-light border rounded text-black mb-2">
               {" "}
               Reference Details
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Reference name 1 :</label>
               <input
                 type="text"
@@ -804,7 +811,7 @@ const EditPage = () => {
                 }
               />
             </div>
-            <div className="col-4 mb-2">
+            <div className="col-6 col-md-4 mb-2">
               <label className="mb-0"> Reference name 2 :</label>
               <input
                 type="text"
@@ -817,12 +824,11 @@ const EditPage = () => {
               />
             </div>
           </div>
-        </form>
-        <div className="col-12 border">
-          <button onClick={handleUpdate} className="btn btn-primary">
-            Submit
+          <button onClick={handleUpdate} className="btn btn-primary col-12 mt-2">
+            Update Customer Detail
           </button>
-        </div>
+        </form>
+        
       </div>
     </>
   );
