@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { FiEye } from "react-icons/fi";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
 
 const ViewPage = () => {
-  const atview = useLocation().pathname.includes("view");
-  if (atview) {
-    if (document.getElementById("navbar-main")) {
-      document.getElementById("navbar-main").style.display = "none";
-    }
-    // document.getElementById("navbar-main").style.display = "none";
-  }
+
   const data = useSelector((st) => st.view.data);
 
   const [doc, setdoc] = useState([])

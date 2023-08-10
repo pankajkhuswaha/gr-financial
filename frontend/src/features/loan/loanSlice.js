@@ -1,4 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getallUsers } from "utils/api";
+import { getallNotification } from "utils/api";
 import { getAllCustomer } from "utils/api";
 
 export const getallCustomerData = createAsyncThunk(
@@ -11,6 +13,27 @@ export const getallCustomerData = createAsyncThunk(
     }
   }
 );
+export const getallnotification = createAsyncThunk(
+  "customer/get-notification",
+  async (thunkAPI) => {
+    try {
+      return await getallNotification();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+export const getallUserAcess = createAsyncThunk(
+  "customer/get-users",
+  async (thunkAPI) => {
+    try {
+      return await getallUsers();
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 
 const initialState = {
   data: {
@@ -30,6 +53,8 @@ const initialState = {
     company: {},
   },
   customerdata: [],
+  notification:[],
+  userlist:[],
   filterdata: "none",
   searchdata: "hjhjh",
 };
@@ -90,6 +115,36 @@ const loanSlice = createSlice({
         state.customerdata = action.payload;
       })
       .addCase(getallCustomerData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(getallnotification.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getallnotification.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.notification = action.payload;
+      })
+      .addCase(getallnotification.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error;
+      })
+      .addCase(getallUserAcess.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getallUserAcess.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.userlist = action.payload;
+      })
+      .addCase(getallUserAcess.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

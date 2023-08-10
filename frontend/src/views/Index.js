@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
 import { GrView } from "react-icons/gr";
+import Select from "react-select";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import "./index.css";
@@ -24,19 +25,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { getallCustomerData } from "features/loan/loanSlice";
 import { addviewCustomer } from "features/loan/customer";
 import { deleteCustomer } from "utils/api";
+import { getallUserAcess } from "features/loan/loanSlice";
+import { assignCustomers } from "utils/api";
 
 const Index = ({ direction, ...args }) => {
   const [show, setShow] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const intial = useSelector((st) => st.customer.customerdata);
   const [customers, setCustomers] = useState([]);
   const filters = useSelector((st) => st.customer.filterdata);
   const searchs = useSelector((st) => st.customer.filterdata);
+  const allusers = useSelector((st) => st.customer.userlist);
   useEffect(() => {
     dispatch(getallCustomerData());
+    dispatch(getallUserAcess());
   }, [dispatch]);
 
   useEffect(() => {
@@ -58,22 +63,45 @@ const Index = ({ direction, ...args }) => {
       setCustomers(searchs);
     }
   }, [searchs, intial]);
-  const handleView = async(itm)=>{
-    dispatch(addviewCustomer(itm))
-    navigate("/admin/view")
-  }
-  const handleEdit = async(itm)=>{
-    dispatch(addviewCustomer(itm))
-    navigate("/admin/edit")
-  }
-  const handleDelete = async(itm)=>{
-    const _id =itm._id
+  const handleView = async (itm) => {
+    dispatch(addviewCustomer(itm));
+    navigate("/admin/view");
+  };
+  const handleEdit = async (itm) => {
+    dispatch(addviewCustomer(itm));
+    navigate("/admin/edit");
+  };
+  const handleDelete = async (itm) => {
+    const _id = itm._id;
     try {
-      const res = await deleteCustomer({_id})
-      toast.info(res)
-    dispatch(getallCustomerData());
+      const res = await deleteCustomer({ _id });
+      toast.info(res);
+      dispatch(getallCustomerData());
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.message);
+    }
+  };
+  const [selectedOption, setSelectedOption] = useState();
+  const options = [
+    { value: "Individual", label: "Individual" },
+    { value: "Company", label: "Comapany" },
+    { value: "Firm", label: "Firm" },
+  ];
+
+  const handleLoanSelection = (e) => {
+    setSelectedOption(e);
+    const opt = e.value
+    const filt = intial.filter((item) => opt.includes(item.customertype));
+    setCustomers(filt)
+  };
+  const user = JSON.parse(localStorage.getItem("user"))
+  const handleAssign =async(e,it)=>{
+    const data ={userid : e.target.value,customerid:it}
+    try {
+      const res = await assignCustomers(data)
+      toast.success(res)
+    } catch (error) {
+      toast.error(error.response.data)
     }
   }
 
@@ -85,34 +113,19 @@ const Index = ({ direction, ...args }) => {
       <div className="trigeredbut">
         <Card className="shadow col-12">
           <CardHeader className="border-0">
-            <Row className="align-items-center ">
-              <div className="col">
-                <h3 className="mb-0">
-                  {!show ? (
-                    <FiFilter
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShow(!show)}
-                    />
-                  ) : (
-                    <MdCancel />
-                  )}
-                  <span
-                    onClick={() => setShow(!show)}
-                    style={{
-                      position: "relative",
-                      left: "7px",
-                      top: "2px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Filters
-                  </span>
-                </h3>
+            <div className="d-flex flex-col md-flex-row align-items-center col-12 justify-content-between ">
+              <div className="col-12 col-md-8 mt-4 d-flex align-items-center">
+                  <Select
+                  className="col-6"
+                    placeholder="Select Customer Type"
+                    defaultValue={selectedOption}
+                    onChange={handleLoanSelection}
+                    options={options}
+                  />
+                  <Button onClick={()=>setCustomers(intial)} className="col-3 btn btn-danger">Clear Filters</Button>
               </div>
-              <div className="col text-right">
-                {/* fssssssssssssssssssssssssssssssssssss */}
-
-                <Dropdown
+              <div className="col-12 col-md-4">
+              <Dropdown
                   isOpen={dropdownOpen}
                   toggle={toggle}
                   direction={direction}
@@ -129,9 +142,9 @@ const Index = ({ direction, ...args }) => {
                       <DropdownItem>Company</DropdownItem>
                     </Link>
                   </DropdownMenu>
-                </Dropdown>
+                </Dropdown>                
               </div>
-            </Row>
+            </div>
           </CardHeader>
         </Card>
       </div>
@@ -201,6 +214,7 @@ const Index = ({ direction, ...args }) => {
                   <th scope="col" style={{ maxWidth: "120px" }}>
                     Customer Type
                   </th>
+                  {user?.super && <th scope="col">Assign</th>}
                   <th scope="col">Customer name</th>
                   <th scope="col" style={{ maxWidth: "90px" }}>
                     Mobile
@@ -223,6 +237,18 @@ const Index = ({ direction, ...args }) => {
                       </th>
                       <td>{itm.createdAt.split("T")[0]}</td>
                       <td>{itm.customertype}</td>
+                      {user?.super && <td >
+                        <div className="form-control">
+                        <select className="border-0" onChange={(e)=>handleAssign(e,itm._id)}>
+                          <option>{itm.handleby}</option>
+                          {allusers.map((user,i)=>{
+                            if(user.name!==itm.handleby){
+                              return <option value={user._id} key={i}>{user.name}</option>
+                            }
+                          })}
+                        </select>
+                        </div>
+                        </td>}
                       <td>{itm.persondetails[0]?.name}</td>
                       <td>{itm.persondetails[0]?.mobile}</td>
                       <td>{itm?.loantype?.join(" ")}</td>
@@ -233,18 +259,18 @@ const Index = ({ direction, ...args }) => {
                             fontSize={22}
                             color="green"
                             style={{ cursor: "pointer" }}
-                            onClick={()=>handleEdit(itm)}
+                            onClick={() => handleEdit(itm)}
                           />
                           <AiFillDelete
                             fontSize={22}
                             color="red"
-                            onClick={()=>handleDelete(itm)}
+                            onClick={() => handleDelete(itm)}
                             style={{ cursor: "pointer" }}
                           />
                           <GrView
                             fontSize={22}
                             color="skyblue"
-                            onClick={()=>handleView(itm)}
+                            onClick={() => handleView(itm)}
                             style={{ cursor: "pointer" }}
                           />
                         </div>

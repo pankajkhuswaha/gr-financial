@@ -138,6 +138,24 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
     res.json({ accessToken });
   });
 });
+const verifyUser = asyncHandler(async (req, res) => {
+  let token;
+  if (req?.headers?.authorization?.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+    try {
+      if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded?.id);
+        req.user = user;
+        res.json({success:true})
+      }
+    } catch (error) {
+      res.json("Not Authorized token expired, Please Login again");
+    }
+  } else {
+    res.json(" There is no token attached to header");
+  }
+});
 
 // logout functionality
 
@@ -217,7 +235,7 @@ const updateRole = asyncHandler(async (req, res) => {
 // Get all users
 const getallUser = asyncHandler(async (req, res) => {
   try {
-    const getUsers = await User.find().populate("wishlist");
+    const getUsers = await User.find()
     res.json(getUsers);
   } catch (error) {
     throw new Error(error);
@@ -374,5 +392,6 @@ module.exports = {
   resetPassword,
   loginAdmin,
   updateRole,
-  isAdminuser
+  isAdminuser,
+  verifyUser  
 };

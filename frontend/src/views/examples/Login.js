@@ -32,6 +32,7 @@ const Login = () => {
         toast.success("Login Sucessfull");
         localStorage.setItem("user", JSON.stringify(res.data));
         navigate("/admin");
+        window.location.reload()
       } else {
         alert("sdfs");
         toast.error(res.data);

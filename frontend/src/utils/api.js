@@ -71,3 +71,24 @@ export const updateCustomer = async (data) => {
   const response = await axios.put(`${base_url}customer`, data, config);
   return response.data;
 };
+
+export const verifyUserLogin = async (data) => {
+  const response = await axios.post(`${base_url}user/verify`, data, config);
+  return response.data;
+};
+
+export const getallNotification = async (data) => {
+  const response = await axios.get(`${base_url}customer/reminder`, config);
+  return response.data;
+};
+
+export const getallUsers = async (data) => {
+  const response = await axios.get(`${base_url}user/all-users`, config);
+  return response.data;
+};
+
+export const assignCustomers = async (data) => {
+  const response = await axios.post(`${base_url}customer/assign`, data,config);
+  return response.data;
+};
+

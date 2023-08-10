@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // reactstrap components
-import { BsFillBellFill } from "react-icons/bs";
+import {  BsFillBellFill } from "react-icons/bs";
 import {
   DropdownMenu,
   DropdownItem,
@@ -18,19 +18,52 @@ import {
 } from "reactstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSearch } from "features/loan/loanSlice";
+import { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import Tooltip from "@mui/material/Tooltip";
+import pop from "../../assets/birthday.gif";
+import bell from "../../assets/bell.gif";
+import { AiOutlineLogout } from "react-icons/ai";
 
 const AdminNavbar = (props) => {
   const intial = useSelector((st) => st.customer.customerdata);
-  const dispatch = useDispatch()
+  const nofictaion = useSelector((st) => st.customer.notification);
+  const [reminder, setsetting] = useState([])
+  const dispatch = useDispatch();
+  const pathname = useLocation().pathname;
+  const atviews = pathname.includes("edit")||pathname.includes("view")
+  const [atview, setAtview] = useState(atviews)
+  useEffect(()=>{
+    setsetting(nofictaion)
+  },[nofictaion])
+  useEffect(()=>{
+    setAtview(atviews)
+  },[atviews])
+  const navigate = useNavigate()
   const handleSearch = (e) => {
     const filt = intial.filter((item) => {
-      return item.persondetails.some((person) => person.mobile.includes(e.target.value));
+      return item.persondetails.some((person) =>
+        person.mobile.includes(e.target.value)
+      );
     });
     dispatch(toggleSearch(filt));
   };
+  const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+  const user = JSON.parse(localStorage.getItem("user"))
 
   return (
     <>
+    {!atview &&
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
         <Container fluid>
           <Link
@@ -46,14 +79,59 @@ const AdminNavbar = (props) => {
                   <InputGroupText>
                     <i className="fas fa-search" />
                   </InputGroupText>
-                </InputGroupAddon>                
-                <Input placeholder="Search" type="number" onChange={handleSearch}/>
+                </InputGroupAddon>
+                <Input
+                  placeholder="Search"
+                  type="number"
+                  onChange={handleSearch}
+                />
               </InputGroup>
             </FormGroup>
           </Form>
-          <div className="d-none d-md-block" style={{ margin: "10px" }}>
-            <BsFillBellFill color="white" fontSize={25} />
-          </div>
+          <Box
+            className="d-none d-md-block"
+            sx={{ flexGrow: 0, marginRight: 2 }}
+          >
+            <Tooltip title="Reminder" sx={{ background: "white" }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <BsFillBellFill color="white" fontSize={25} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: "35px", cursor: "pointer" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {reminder.map((e, i) => (
+                <div
+                  className="shadow bg-white"
+                  key={i}
+                  onClick={handleCloseUserMenu}
+                >
+                  <div
+                    className="border-bottom px-2 d-flex align-items-center"
+                    style={{ width: "260px" }}
+                  >
+                    {e.type==="birthday"&&<img src={pop} alt="" style={{ width: 60 }} />}
+                    {e.type==="disburse"&&<img src={bell} alt="" style={{ width: 60 }}/>}
+                    <p className="mb-0 mt-2 text-sm">{e.message}</p>
+                  </div>
+                </div>
+              ))}
+              {reminder.length===0&& <p>No Reminder for today</p>}
+            </Menu>
+          </Box>
 
           <Nav className="align-items-center d-none d-md-flex" navbar>
             <UncontrolledDropdown nav>
@@ -71,9 +149,21 @@ const AdminNavbar = (props) => {
                     style={{ color: "white" }}
                     className="mb-0 text-sm font-weight-bold "
                   >
-                    Admin
+                    {user?.name}
                   </span>
                 </Media>
+                <Media className="ml-2 d-none d-lg-block" onClick={()=>{
+                  localStorage.removeItem("user")
+                  navigate("/auth")
+                }} style={{cursor:"pointer"}}>
+                  <span
+                    style={{ color: "white" }}
+                    className="mb-0 text-sm font-weight-bold "
+                  >
+                    <AiOutlineLogout fontSize={25} color="red" />
+                  </span>
+                </Media>
+
               </Media>
               {/* </DropdownToggle> */}
               <DropdownMenu className="dropdown-menu-arrow" right>
@@ -105,7 +195,7 @@ const AdminNavbar = (props) => {
             </UncontrolledDropdown>
           </Nav>
         </Container>
-      </Navbar>
+      </Navbar>}
     </>
   );
 };

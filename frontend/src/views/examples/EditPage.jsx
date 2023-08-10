@@ -1,24 +1,15 @@
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import { updateCustomer } from "utils/api";
 const EditPage = () => {
-  const atview = useLocation().pathname.includes("edit");
-  if (atview) {
-    if (document.getElementById("navbar-main")) {
-      document.getElementById("navbar-main").style.display = "none !important";
-    }
-    // document.getElementById("navbar-main").style.display = "none";
-  }
-
- 
-
   const data = useSelector((st) => st.view.data);
+
   const [formdata, setformdata] = useState(data);
-  const prevtype = formdata.loantype.map((itm) => ({ value: itm, label: itm }));
+  const prevtype = formdata?.loantype?.map((itm) => ({ value: itm, label: itm }));
   const [selectedOption, setSelectedOption] = useState(prevtype);
   const options = [
     { value: "PL", label: "PL" },
@@ -29,7 +20,7 @@ const EditPage = () => {
   ];
   const handleLoanType = (e) => {
     setSelectedOption(e);
-    const opt = e.map((itm) => itm.value);
+    const opt = e?.map((itm) => itm.value);
     setformdata({ ...formdata, loantype: opt });
   };
   const handleaddnewCar = (e) => {
@@ -38,12 +29,11 @@ const EditPage = () => {
       carName: "",
       modelNumber: "",
       insuredBy: "",
-      cardetails: "",
       policyRenewalMonth: "",
       policy: "",
     };
-    formdata.cardetails.push(newCar);
-    setformdata({ ...formdata, cardetails: formdata.cardetails });
+    const updatedCardetails = formdata.cardetails.length === 0 ? [newCar] : [...formdata.cardetails, newCar];
+  setformdata({ ...formdata, cardetails: updatedCardetails });
   };
   const handleCardelte = (i) => {
     formdata.cardetails.splice(i, 1);
@@ -57,8 +47,8 @@ const EditPage = () => {
       propertyType: "",
       propertyAddress: "",
     };
-    formdata.propertydeatils.push(newproperty);
-    setformdata({ ...formdata, propertydeatils: formdata.propertydeatils });
+    const updatedCardetails = formdata.propertydeatils.length === 0 ? [newproperty] : [...formdata.propertydeatils, newproperty];
+  setformdata({ ...formdata, propertydeatils: updatedCardetails });
   };
   const handlepropertydelte = (i) => {
     formdata.propertydeatils.splice(i, 1);
@@ -77,19 +67,20 @@ const EditPage = () => {
     const navigate = useNavigate()
    const handleUpdate = async(e) => {
     e.preventDefault();
+    // console.log(formdata)
     try {
       const res = await updateCustomer(formdata);
+      console.log(res)
       toast.success(res.message)
       navigate("/admin/index")
     } catch (error) {
       toast.error(error.response.data.error)
     }
   };
-
   return (
     <>
     <ToastContainer/>
-      <div className="col-12 p-4">
+      {formdata._id && <div className="col-12 p-4">
         <p
           className="text-xl col-12 text-center mb-0 pb-0"
           style={{ fontWeight: "500" }}
@@ -106,6 +97,7 @@ const EditPage = () => {
                 className="form-control"
                 placeholder="Customer Id"
                 value={formdata.customerid}
+                readOnly
               />
             </div>
             <div className="col-6 col-md-4 mb-2">
@@ -182,7 +174,7 @@ const EditPage = () => {
               {" "}
               Person Details
             </div>
-            {formdata.persondetails?.map((it, i) => (
+            {formdata?.persondetails?.map((it, i) => (
               <div key={i} className="col-12 row border-bottom mb-2">
                 <div className="col-6 col-md-4 mb-2">
                   <label className="mb-0"> Name :</label>
@@ -387,9 +379,9 @@ const EditPage = () => {
               </div>
             ))}
             {/* firmdetails deatils columns */}
-            {formdata.firm[0]?.name &&
+            {formdata?.firm[0]?.name &&
               formdata.firm?.map((it, i) => (
-                <div className="col-12 row mb-2">
+                <div key={i} className="col-12 row mb-2">
                   <div className="col-12 mt-2 text-lg text-center bg-light border rounded text-black mb-2">
                     {" "}
                     Firm Details
@@ -459,7 +451,7 @@ const EditPage = () => {
             {/* Company deatils columns */}
             {formdata.company[0]?.name &&
               formdata.company?.map((it, i) => (
-                <div className="col-12 row mb-2">
+                <div key={i} className="col-12 row mb-2">
                   <div className="col-12 mt-2 text-lg text-center bg-light border rounded text-black mb-2">
                     {" "}
                     Company Details
@@ -557,7 +549,7 @@ const EditPage = () => {
             </div>
             {/* car deatils columns */}
             {formdata.cardetails?.map((it, i) => (
-              <div className="col-12 row mb-2">
+              <div key={i} className="col-12 row mb-2">
                 <div className="col-12 mt-2 text-lg text-center text-black mb-2">
                   {" "}
                   Car Details
@@ -696,8 +688,8 @@ const EditPage = () => {
               Add new car
             </button>
             {/* property deatils columns */}
-            {formdata.propertydeatils?.map((it, i) => (
-              <div className="col-12 row mb-2">
+            {formdata?.propertydeatils?.map((it, i) => (
+              <div key={i} className="col-12 row mb-2">
                 <p style={buttonStyle} onClick={handlepropertydelte}>
                   <MdDelete color="red" />
                 </p>
@@ -829,9 +821,10 @@ const EditPage = () => {
           </button>
         </form>
         
-      </div>
+      </div>}
     </>
   );
+  
 };
 
 export default EditPage;
