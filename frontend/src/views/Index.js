@@ -27,6 +27,7 @@ import { addviewCustomer } from "features/loan/customer";
 import { deleteCustomer } from "utils/api";
 import { getallUserAcess } from "features/loan/loanSlice";
 import { assignCustomers } from "utils/api";
+import { getallnotification } from "features/loan/loanSlice";
 
 const Index = ({ direction, ...args }) => {
   const [show, setShow] = useState(false);
@@ -77,6 +78,7 @@ const Index = ({ direction, ...args }) => {
       const res = await deleteCustomer({ _id });
       toast.info(res);
       dispatch(getallCustomerData());
+      dispatch(getallnotification());
     } catch (error) {
       toast.error(error.message);
     }
@@ -90,20 +92,21 @@ const Index = ({ direction, ...args }) => {
 
   const handleLoanSelection = (e) => {
     setSelectedOption(e);
-    const opt = e.value
+    const opt = e.value;
     const filt = intial.filter((item) => opt.includes(item.customertype));
-    setCustomers(filt)
+    setCustomers(filt);
   };
-  const user = JSON.parse(localStorage.getItem("user"))
-  const handleAssign =async(e,it)=>{
-    const data ={userid : e.target.value,customerid:it}
+  const user = JSON.parse(localStorage.getItem("user"));
+  const handleAssign = async (e, it) => {
+    const data = { userid: e.target.value, customerid: it };
     try {
-      const res = await assignCustomers(data)
-      toast.success(res)
+      const res = await assignCustomers(data);
+      toast.success(res);
     } catch (error) {
-      toast.error(error.response.data)
+      toast.error(error.response.data);
     }
-  }
+    dispatch(getallCustomerData())
+  };
 
   return (
     <>
@@ -115,17 +118,22 @@ const Index = ({ direction, ...args }) => {
           <CardHeader className="border-0">
             <div className="d-flex flex-col md-flex-row align-items-center col-12 justify-content-between ">
               <div className="col-12 col-md-8 mt-4 d-flex align-items-center">
-                  <Select
+                <Select
                   className="col-6"
-                    placeholder="Select Customer Type"
-                    defaultValue={selectedOption}
-                    onChange={handleLoanSelection}
-                    options={options}
-                  />
-                  <Button onClick={()=>setCustomers(intial)} className="col-3 btn btn-danger">Clear Filters</Button>
+                  placeholder="Select Customer Type"
+                  defaultValue={selectedOption}
+                  onChange={handleLoanSelection}
+                  options={options}
+                />
+                <Button
+                  onClick={() => setCustomers(intial)}
+                  className="col-3 btn btn-danger"
+                >
+                  Clear Filters
+                </Button>
               </div>
               <div className="col-12 col-md-4">
-              <Dropdown
+                <Dropdown
                   isOpen={dropdownOpen}
                   toggle={toggle}
                   direction={direction}
@@ -142,7 +150,7 @@ const Index = ({ direction, ...args }) => {
                       <DropdownItem>Company</DropdownItem>
                     </Link>
                   </DropdownMenu>
-                </Dropdown>                
+                </Dropdown>
               </div>
             </div>
           </CardHeader>
@@ -237,18 +245,27 @@ const Index = ({ direction, ...args }) => {
                       </th>
                       <td>{itm.createdAt.split("T")[0]}</td>
                       <td>{itm.customertype}</td>
-                      {user?.super && <td >
-                        <div className="form-control">
-                        <select className="border-0" onChange={(e)=>handleAssign(e,itm._id)}>
-                          <option>{itm.handleby}</option>
-                          {allusers.map((user,i)=>{
-                            if(user.name!==itm.handleby){
-                              return <option value={user._id} key={i}>{user.name}</option>
-                            }
-                          })}
-                        </select>
-                        </div>
-                        </td>}
+                      {user?.super && (
+                        <td>
+                          <div className="form-control">
+                            <select
+                              className="border-0"
+                              onChange={(e) => handleAssign(e, itm._id)}
+                            >
+                              <option>{itm.handleby}</option>
+                              {allusers.map((user, i) => {
+                                if (user.name !== itm.handleby) {
+                                  return (
+                                    <option value={user._id} key={i}>
+                                      {user.name}
+                                    </option>
+                                  );
+                                }
+                              })}
+                            </select>
+                          </div>
+                        </td>
+                      )}
                       <td>{itm.persondetails[0]?.name}</td>
                       <td>{itm.persondetails[0]?.mobile}</td>
                       <td>{itm?.loantype?.join(" ")}</td>
@@ -279,6 +296,7 @@ const Index = ({ direction, ...args }) => {
                   ))}
               </tbody>
             </Table>
+            {customers?.length === 0 && <p className="text-center mt-4">No Customer Found</p>}
           </Card>
         </Row>
       </Container>

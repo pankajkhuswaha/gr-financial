@@ -10,6 +10,9 @@ import AuthFooter from "components/Footers/AuthFooter.js";
 
 import routes from "routes.js";
 import { ToastContainer } from "react-toastify";
+import OtpVerify from "../views/authentication/OtpVerify";
+import Forgot from "views/authentication/Forgot";
+import LinkSucess from "views/authentication/LinkSucess";
 
 const Auth = (props) => {
   const mainContent = React.useRef(null);
@@ -77,7 +80,10 @@ const Auth = (props) => {
           <Row className="justify-content-center">
             <Routes>
               {getRoutes(routes)}
-              <Route path="*" element={<Navigate to="/auth/login" replace />} />
+              <Route path="*" element={<Navigate to="/auth/login" replace />} /> 
+              <Route path="/reset-password/:id" element={<OtpVerify/>}/> 
+              <Route path="/forgot-password" element={<Forgot/>}/>               
+              <Route path="/link-success" element={<LinkSucess/>}/>               
             </Routes>
           </Row>
         </Container>

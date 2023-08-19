@@ -335,22 +335,33 @@ const updatePassword = asyncHandler(async (req, res) => {
 const forgetPasswordToken = asyncHandler(async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-  if (!user) throw new Error("User Not find with this Email");
+  if (!user) res.json({ error: "Email is not Registered with us !" });
   try {
     const token = await user.createPasswordResetToken();
     console.log(token);
     await user.save();
-    // const resetUrl = `Hi the link for reset password is valid for 10 minutes only<a href='https://buysellanything.online/reset-password/${token}'>link</a>`;
-    const sendData = `<h1 style=\"color: #333; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; margin-bottom: 16px;\">Password Reset<\/h1>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 8px;\">Hi there,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">We received a request to reset your password. Please click the link below to reset your password:<\/p>\r\n<p style=\"margin-bottom: 16px;\"><a href='https://www.afsdeal.com/reset-password/${token}' style=\"background-color: #007bff; border-radius: 4px; color: #fff; display: inline-block; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; padding: 10px 16px; text-decoration: none;\">Reset Password<\/a><\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">If you did not request a password reset, you can ignore this email and your password will not be changed.<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5;\">Thank you,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 0;\">The Example Team<\/p>\r\n`;
+    const sendData = `<h1 style=\"color: #333; font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; margin-bottom: 16px;\">Password Reset<\/h1>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 8px;\">Hi there,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">We received a request to reset your password. Please click the link below to reset your password:<\/p>\r\n<p style=\"margin-bottom: 16px;\"><a href='https://grfinancial.in/reset-password/${token}' style=\"background-color: #007bff; border-radius: 4px; color: #fff; display: inline-block; font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; padding: 10px 16px; text-decoration: none;\">Reset Password<\/a><\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 16px;\">If you did not request a password reset, you can ignore this email and your password will not be changed.<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5;\">Thank you,<\/p>\r\n<p style=\"color: #666; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; margin-bottom: 0;\">The Example Team<\/p>\r\n`;
     const data = {
       to: email,
-      subject: "Password Reset Link from AFS Deals",
-      // text: "password reset link",
+      subject: "Password Reset Link from Jhev Motors",
       html: sendData,
     };
     sendEmail(data);
     res.json(token);
   } catch (err) {}
+});
+const checkresetPasswordUser = asyncHandler(async (req, res) => {
+  const token = req.params.token;
+  const hashToken = crypto.createHash("sha256").update(token).digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashToken,
+    passwordResetExpire: {
+      $gt: Date.now(),
+    },
+  });
+
+  if (!user) res.json({ error: "Token  Expired Please Try again" });
+  res.json(user.email);
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
@@ -366,12 +377,12 @@ const resetPassword = asyncHandler(async (req, res) => {
     },
   });
 
-  if (!user) throw new Error("Token  Expired Please Try again");
+  if (!user) res.json({ error: "Token  Expired Please Try again" });
   user.password = password;
   user.passwordResetToken = undefined;
   user.passwordResetExpire = undefined;
   await user.save();
-  res.json(user);
+  res.json("Password was changed Sucessfully");
 });
 
 // getAllOrders()
@@ -393,5 +404,6 @@ module.exports = {
   loginAdmin,
   updateRole,
   isAdminuser,
-  verifyUser  
+  verifyUser ,
+  checkresetPasswordUser 
 };

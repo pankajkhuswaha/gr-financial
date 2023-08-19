@@ -45,6 +45,7 @@ const Upload = ({ direction, ...args }) => {
     const merge = { ...data, documents: docData };
     try {
       const res = await addCustomer(merge);
+      console.log(res)
       dispatch(resetData());
       navigate("/admin/index");
       toast.success(res.data);

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import {
   Button,
@@ -32,9 +32,8 @@ const Login = () => {
         toast.success("Login Sucessfull");
         localStorage.setItem("user", JSON.stringify(res.data));
         navigate("/admin");
-        window.location.reload()
+        window.location.reload();
       } else {
-        alert("sdfs");
         toast.error(res.data);
       }
     } catch (error) {
@@ -96,26 +95,28 @@ const Login = () => {
                   />
                 </InputGroup>
               </FormGroup>
+              <Row className="mt-1">
+                <Col xs="6">
+                  <Link style={{color:"blue"}} to={"/auth/forgot-password"}>
+                    Forgot password?
+                  </Link>
+                </Col>
+              </Row>
 
               <div className="text-center">
-                <Button className="my-4" color="primary" type="submit">
+                <Button
+                  onClick={handleLogin}
+                  className="my-4"
+                  color="primary"
+                  type="submit"
+                >
                   Sign in
                 </Button>
               </div>
+              
             </Form>
           </CardBody>
         </Card>
-        <Row className="mt-1">
-          <Col xs="6">
-            <a
-              className="text-light"
-              href="#pablo"
-              onClick={(e) => e.preventDefault()}
-            >
-              {/* <small>Forgot password?</small> */}
-            </a>
-          </Col>
-        </Row>
       </Col>
     </>
   );

@@ -5,7 +5,8 @@ const addCustomer = asyncHandle(async (req, res) => {
   const cus = await Customer.find();
   const data = {
     customertype: req.body.loantype,
-    customerid: `GRFinancial00${cus?.length + 2 || 1}`,
+    handleby:req.user.name,
+    customerid: `GRF00${cus?.length + 1 || 1}`,
     persondetails: req.body.persondetails,
     ref1: req.body.reference.firstreferance,
     ref2: req.body.reference.secondreference,
@@ -24,7 +25,6 @@ const addCustomer = asyncHandle(async (req, res) => {
   };
   try {
     const newCustomer = await Customer.create(data);
-    console.log(newCustomer);
     res.json("Customer is Added Sucessfully");
   } catch (error) {
     res.json(error.message);
@@ -73,17 +73,17 @@ const updateCustomer = asyncHandle(async (req, res) => {
 });
 
 const getCustomerData = asyncHandle(async (req, res) => {
- const user =req.user
-  let data = []
+  const user = req.user;
+  let data = [];
   const cus = await Customer.find();
   for (let i = 0; i < cus.length; i++) {
-    if(cus[i].handleby===user.name){
-      data.push(cus[i])
-    }    
+    if (cus[i].handleby === user.name) {
+      data.push(cus[i]);
+    }
   }
-  if(user.super){
+  if (user.super) {
     res.json(cus);
-  }else{
+  } else {
     res.json(data);
   }
 });
@@ -93,7 +93,7 @@ const AssignCustomer = asyncHandle(async (req, res) => {
 
   try {
     const use = await User.findOne({ _id: userid });
-    
+
     if (!use) {
       return res.status(404).json("User not found");
     }
@@ -103,18 +103,16 @@ const AssignCustomer = asyncHandle(async (req, res) => {
       { $set: { handleby: use.name } },
       { new: true } // This option returns the updated document
     );
-    
+
     if (!cus) {
       return res.status(404).json("Customer not found");
     }
 
     res.json("Assigned Successfully");
   } catch (error) {
-    console.log(error);
     res.status(500).json("Assignment Failed");
   }
 });
-
 
 const deleteCustomerData = asyncHandle(async (req, res) => {
   if (req.params.id) {
@@ -137,6 +135,11 @@ const getAllReminders = asyncHandle(async (req, res) => {
   const todayMonth = today.getMonth() + 1;
   const todayDay = today.getDate();
   const todayYear = today.getFullYear();
+  const fromatedTodayDate = JSON.stringify(
+    new Date([todayMonth, todayDay + 1, todayYear].join("-"))
+  )
+    .split("T")[0]
+    .split('"')[1];
 
   data.forEach((entry) => {
     entry.persondetails.forEach((person) => {
@@ -147,51 +150,70 @@ const getAllReminders = asyncHandle(async (req, res) => {
       if (personMonth === todayMonth && personDay === todayDay) {
         birtdayReminder.push({
           message: `Today is ${person.name}'s birthday!`,
-          details: person,
+          details: entry,
           type: "birthday",
         });
       }
     });
   });
-  // const monthsBeforeDisbursement = 2;
-  // const reminderDate = JSON.stringify(
-  //   new Date([todayMonth + 2, todayDay + 1, todayYear].join("-"))
-  // )
-  //   .split("T")[0]
-  //   .split('"')[1];
-  // data.forEach((entry) => {
-  //   const dat = JSON.stringify(new Date(entry.dateOfDisburment))
-  //     .split("T")[0]
-  //     .split('"')[1];
-  //   if (reminderDate === dat) {
-  //     disburseReminder.push({
-  //       message: `${entry.customerid} completed six month of disbursement.`,
-  //       type: "disburse",
-  //       details: entry,
-  //     });
-  //   }
-  // });
   data.forEach(async (customer) => {
-    const { _id, dateOfDisburment, persondetails } = customer;
+    const { _id, dateOfDisburment } = customer;
 
     const sixMonthsAfter = new Date(dateOfDisburment);
     sixMonthsAfter.setMonth(sixMonthsAfter.getMonth() + 6);
-    const news = JSON.stringify(sixMonthsAfter).split("T")[0].split('"')[1]
-    const dat = JSON.stringify(
-      new Date([todayMonth, todayDay + 1, todayYear].join("-"))
-    )
+    const datetoCheckForDisbursement = JSON.stringify(sixMonthsAfter)
       .split("T")[0]
       .split('"')[1];
-      console.log(news,dat)
-    // Compare with the current date
-    if (news===dat) {
+    if (datetoCheckForDisbursement === fromatedTodayDate) {
       disburseReminder.push({
-        message: `${entry.customerid} completed six month of disbursement.`,
+        message: `${customer.customerid} completed six month of disbursement.`,
         type: "disburse",
-        details: entry,
+        details: customer,
       });
     }
+    if (customer.cardetails.length !== 0) {
+      const carDetails = customer.cardetails;
+      if (carDetails) {
+        carDetails.forEach(async (car) => {
+          const renewalMonth = car.policyRenewalMonth;
+          const month = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+          function getPreviousMonth(selectedMonth) {
+            const selectedMonthIndex = month.indexOf(selectedMonth);
+            const previousMonthIndex =
+              selectedMonthIndex === 0 ? 11 : selectedMonthIndex - 1;
+            return month[previousMonthIndex];
+          }
+
+          if (renewalMonth) {
+            const previousMonth = getPreviousMonth(renewalMonth);
+            const Month = month[todayMonth - 1];            
+            if (previousMonth === Month) {
+              const dataa ={
+                message: `${customer.customerid}'s car policy renewal is in next month.`,
+                details: customer,
+                type: "disburse",
+              }
+              disburseReminder.push(dataa)
+            }
+          }
+        });
+      }
+    }
   });
+
   const merge = birtdayReminder.concat(disburseReminder);
   res.json(merge);
 });
@@ -202,5 +224,5 @@ module.exports = {
   deleteCustomerData,
   updateCustomer,
   getAllReminders,
-  AssignCustomer
+  AssignCustomer,
 };

@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { useLocation, Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  Route,
+  Routes,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 // reactstrap components
 import { Container } from "reactstrap";
 // core components
@@ -36,31 +42,33 @@ const Admin = (props) => {
     });
   };
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const verifyLogin = async()=>{
-    const user = JSON.parse(localStorage.getItem("user"))?.email
-    if(user){
+  const dispatch = useDispatch();
+  const verifyLogin = async () => {
+    const user = JSON.parse(localStorage.getItem("user"))?.email;
+    if (user) {
       try {
         const res = await verifyUserLogin();
-        if(res.success){
-          return
-        }else{
-          toast.info("Your login session is expired. Please Login again !")
-          localStorage.removeItem("user")
-          window.location.reload()
+        if (res.success) {
+          return;
+        } else {
+          toast.info("Your login session is expired. Please Login again !");
+          localStorage.removeItem("user");
+          window.location.reload();
         }
       } catch (error) {
-        navigate("/auth")
-        toast.info("Your login session is expired. Please Login again !")
-        console.log(error)
+        navigate("/auth");
+        toast.info("Your login session is expired. Please Login again !");
       }
+    } else {
+      navigate("/auth");
+      toast.info("Your login session is expired. Please Login again !");
     }
-  }
+  };
 
-  useEffect(()=>{
-    verifyLogin()
-    dispatch(getallnotification())
-  },[])
+  useEffect(() => {
+    verifyLogin();
+    dispatch(getallnotification());
+  }, []);
 
   const getBrandText = (path) => {
     for (let i = 0; i < routes.length; i++) {

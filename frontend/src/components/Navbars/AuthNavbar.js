@@ -9,7 +9,7 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = () => {
-  const atLogin = useLocation().pathname.includes('login')
+  const atLogin = useLocation().pathname.includes('auth')
   return (
     <>
       <Navbar className="navbar-top navbar-horizontal navbar-dark" expand="md">     

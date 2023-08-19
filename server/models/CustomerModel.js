@@ -3,8 +3,6 @@ const CustomerModel = new mongoose.Schema(
   {
     handleby: {
       type: String,
-      require: true,
-      default: "admin",
     },
     customertype: {
       type: String,
