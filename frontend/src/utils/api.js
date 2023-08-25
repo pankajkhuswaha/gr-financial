@@ -50,7 +50,51 @@ export const uploadDoc = (data) => {
     );
   });
 };
+export const uploadManyDoc = async (data) => {
+  const urlinfo = [];
+  function generateUniqueTimestamp() {
+    const currentTimestamp = Date.now(); // Current timestamp in milliseconds
+    return currentTimestamp.toString();
+  }
+  
+  const uniqueTimestamp = generateUniqueTimestamp();
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const file = data[i];
+      const fileAdress = ref(storage, `finance/${uniqueTimestamp}${file.name}`);
+      const uploadTask = uploadBytesResumable(fileAdress, file);
 
+      await new Promise((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const process =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            if (process === 100) {
+              // File uploaded completely.
+            }
+          },
+          (err) => {
+            reject(err);
+          },
+          async () => {
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              urlinfo.push(downloadURL);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          }
+        );
+      });
+    }
+
+    return urlinfo;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getAllCustomer = async () => {
   const response = await axios.get(`${base_url}customer`, config);

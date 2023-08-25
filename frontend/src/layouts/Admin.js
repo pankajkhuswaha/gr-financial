@@ -17,8 +17,9 @@ import ViewPage from "views/examples/ViewPage";
 import EditPage from "views/examples/EditPage";
 import { toast } from "react-toastify";
 import { verifyUserLogin } from "utils/api";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getallnotification } from "features/loan/loanSlice";
+import Loading from "./Loading";
 
 const Admin = (props) => {
   const mainContent = React.useRef(null);
@@ -81,9 +82,11 @@ const Admin = (props) => {
     }
     return "Brand";
   };
+  const load = useSelector(st=>st.loading).show
 
   return (
     <>
+    {load && <Loading/>}
       <Sidebar
         {...props}
         routes={routes}

@@ -20,7 +20,12 @@ import {
 import { TbMapPinCode } from "react-icons/tb";
 // import { addPerson } from "features/loan/loanSlice";
 // import { addReference } from "features/loan/loanSlice";
-import { addPerson,addFirm,addloanType ,addReference} from "features/loan/loanSlice";
+import {
+  addPerson,
+  addFirm,
+  addloanType,
+  addReference,
+} from "features/loan/loanSlice";
 
 const Firm = () => {
   const dispatch = useDispatch();
@@ -87,7 +92,7 @@ const Firm = () => {
         dispatch(addReference(data));
         if ((Firmdata.name, Firmdata.type, Firmdata.adress)) {
           dispatch(addFirm(Firmdata));
-          dispatch(addloanType("Firm"))
+          dispatch(addloanType("Firm"));
           navigate("/NextStep");
         } else {
           toast.warn("Please fill the firm Details !");

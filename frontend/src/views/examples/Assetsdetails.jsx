@@ -15,15 +15,19 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import { addPropertyindvidual,addcarindvidual } from "features/loan/loanSlice";
+import { addPropertyindvidual, addcarindvidual } from "features/loan/loanSlice";
 import { toast } from "react-toastify";
 import { addasset } from "features/loan/loanSlice";
 import { useNavigate } from "react-router-dom";
 import { uploadDoc } from "utils/api";
+import { toggleLoading } from "features/loading/loadingSlice";
+import { addCustomer } from "utils/api";
+import { resetData } from "features/loan/loanSlice";
 
 const Assetsdetails = ({ direction, ...args }) => {
   const [propertyOption, setPropertyOption] = useState("");
   const [carOption, setCarOption] = useState("");
+  const data = useSelector((st) => st.customer.data);
 
   const dispatch = useDispatch();
   const [propertyDetails, setpropertyDetails] = useState({
@@ -46,29 +50,36 @@ const Assetsdetails = ({ direction, ...args }) => {
     policyRenewalMonth: "",
   });
 
-
   const [profitentfund, setProfitantFund] = useState("");
 
   const [cashinhand, setCashinHand] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const handleAsset = (e) => {
+  const handleAsset = async (e) => {
     e.preventDefault();
-    if(profitentfund , cashinhand){
-      const data ={profitentfund , cashinhand}
-      dispatch(addasset(data))
-      navigate("/upload")
-    }else{
-      toast.warn("Please fill all the details to continue")
+    if ((profitentfund, cashinhand)) {
+      const de = { profitentfund, cashinhand,carDetails:previouscar,propertyDetails:previousproperty };
+      const merge = { ...data, assetdetail: de };
+      dispatch(toggleLoading(true))
+      try {
+        const res = await addCustomer(merge);
+        // dispatch(resetData());
+        navigate("/admin/index");
+        toast.success(res.data);
+      } catch (error) {
+        toast.error(error.message);
+      }
+      dispatch(toggleLoading(false))
+    } else {
+      toast.warn("Please fill all the details to continue");
     }
   };
 
-  const handleFileUpload =async (file) => {
+  const handleFileUpload = async (file) => {
+    dispatch(toggleLoading(true));
     let url = await uploadDoc(file);
     setCardetails({ ...cardetails, policy: url });
-    if(url){
-      toast.success("Policy is uploaded Sucessfully")
-    }
+    dispatch(toggleLoading(false));
   };
   const addPropertyForm = () => {
     const { propertyName, propertyDetail, propertyType, propertyAddress } =
@@ -81,7 +92,7 @@ const Assetsdetails = ({ direction, ...args }) => {
         propertyDetail: "",
         propertyType: "",
         propertyAddress: "",
-      })
+      });
     } else {
       toast.warn("Please fill all the details about Property");
     }
@@ -98,7 +109,7 @@ const Assetsdetails = ({ direction, ...args }) => {
         insuredBy: "",
         cardetails: "",
         policyRenewalMonth: "",
-      })
+      });
       toast.success("Car details is added Sucessfully");
     } else {
       toast.warn("Please fill all the details about Car");
@@ -401,18 +412,16 @@ const Assetsdetails = ({ direction, ...args }) => {
                   </Row>
                   <Row>
                     <Col md="6">
-                      <FormGroup>
-                        <Label>Policy Upload</Label>
-                        <InputGroup className="input-group-alternative mb-3">
-                          <InputGroupAddon addonType="prepend"></InputGroupAddon>
-                          <Input
-                            placeholder="Policy Upload "
-                            type="file"
-                            name="upload"
-                            onChange={(e) => handleFileUpload(e.target.files[0])}
-                          />
-                        </InputGroup>
-                      </FormGroup>
+                      <div className="mb-3 shadow-sm">
+                        {" "}
+                        <label>Policy Upload</label>
+                        <input
+                          type="file"
+                          className="fileinput"
+                          name="upload"
+                          onChange={(e) => handleFileUpload(e.target.files[0])}
+                        />
+                      </div>
                     </Col>
                     <Col md="6">
                       <FormGroup>
@@ -492,7 +501,7 @@ const Assetsdetails = ({ direction, ...args }) => {
                   color="primary"
                   type="submit"
                 >
-                  Next
+                  Add Customer
                 </Button>
               </div>
             </Form>

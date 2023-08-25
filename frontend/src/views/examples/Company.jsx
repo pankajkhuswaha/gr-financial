@@ -89,7 +89,7 @@ const Company = () => {
         dispatch(addReference(data));
         if ((companydata.name, companydata.type, companydata.adress)) {
           dispatch(addCompany(companydata));
-          dispatch(addloanType("Company"))
+          dispatch(addloanType("Company"));
           navigate("/NextStep");
         } else {
           toast.warn("Please fill the company Details !");
@@ -371,7 +371,10 @@ const Company = () => {
                         name="firmname"
                         value={companydata.name}
                         onChange={(e) =>
-                          setcompanydata({ ...companydata, name: e.target.value })
+                          setcompanydata({
+                            ...companydata,
+                            name: e.target.value,
+                          })
                         }
                       />
                     </InputGroup>
@@ -391,7 +394,10 @@ const Company = () => {
                         value={companydata.type}
                         name="firmtype"
                         onChange={(e) =>
-                          setcompanydata({ ...companydata, type: e.target.value })
+                          setcompanydata({
+                            ...companydata,
+                            type: e.target.value,
+                          })
                         }
                       />
                     </InputGroup>
@@ -411,7 +417,10 @@ const Company = () => {
                         name="secondreference"
                         value={companydata.adress}
                         onChange={(e) =>
-                          setcompanydata({ ...companydata, adress: e.target.value })
+                          setcompanydata({
+                            ...companydata,
+                            adress: e.target.value,
+                          })
                         }
                       />
                     </InputGroup>

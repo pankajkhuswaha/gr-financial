@@ -140,13 +140,13 @@ const Index = ({ direction, ...args }) => {
                 >
                   <DropdownToggle caret>Add New Costumer</DropdownToggle>
                   <DropdownMenu {...args}>
-                    <Link to={"/auth/register"}>
+                    <Link to={"/auth/add-customer-detail"} state={"individual"}>
                       <DropdownItem>Individual</DropdownItem>
                     </Link>
-                    <Link to={"/auth/FirmRegister"}>
+                    <Link to={"/auth/add-customer-detail"} state={"firm"}>
                       <DropdownItem>Firm</DropdownItem>
                     </Link>{" "}
-                    <Link to={"/auth/CompanyRegister"}>
+                    <Link to={"/auth/add-customer-detail"} state={"company"}>
                       <DropdownItem>Company</DropdownItem>
                     </Link>
                   </DropdownMenu>

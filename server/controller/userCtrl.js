@@ -11,7 +11,7 @@ const { sendEmail } = require("./emailCtrl");
 
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
-  const findUser = await User.findOne({ email: email });
+  const findUser = await User.findOne({ email });
   console.log(findUser);
   if (!findUser) {
     try {

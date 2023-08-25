@@ -19,6 +19,7 @@ import { addDocument } from "features/loan/loanSlice";
 import { useNavigate } from "react-router-dom";
 import { addCustomer } from "utils/api";
 import { resetData } from "features/loan/loanSlice";
+import { uploadManyDoc } from "utils/api";
 
 const Upload = ({ direction, ...args }) => {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ const Upload = ({ direction, ...args }) => {
     const merge = { ...data, documents: docData };
     try {
       const res = await addCustomer(merge);
-      console.log(res)
+      console.log(res);
       dispatch(resetData());
       navigate("/admin/index");
       toast.success(res.data);
@@ -54,12 +55,11 @@ const Upload = ({ direction, ...args }) => {
     }
   };
 
-  const handleDocUpload = async (e, field) => {
+  const handleDocUploads = async (e, field) => {
     e.preventDefault();
     let url;
-    const file = e.target.files[0];
     try {
-      url = await uploadDoc(file);
+      url = await uploadManyDoc(e.target.files);
 
       if (url.includes("http")) {
         switch (field) {
@@ -99,10 +99,51 @@ const Upload = ({ direction, ...args }) => {
       }
     } catch (error) {}
   };
+  const images = [
+    "https://www.pexels.com/photo/woman-jumping-wearing-green-backpack-214574/",
+    "https://www.pexels.com/photo/silhouette-photo-of-woman-against-during-golden-hour-39853/",
+    "https://www.pexels.com/photo/person-hand-reaching-body-of-water-296282/",
+    "https://www.pexels.com/photo/man-wearing-grey-shirt-standing-on-elevated-surface-103123/",
+    "https://www.pexels.com/photo/woman-in-brown-coat-762041/"
+  ];
+  const [imageList, setImageList] = useState(images);
+
+  const handleDragStart = (index) => (event) => {
+    event.dataTransfer.setData("text/plain", index.toString());
+  };
+
+  const handleDragOver = (index) => (event) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (index) => (event) => {
+    event.preventDefault();
+
+    const sourceIndex = Number(event.dataTransfer.getData("text/plain"));
+    const updatedImages = [...imageList];
+    const [movedImage] = updatedImages.splice(sourceIndex, 1);
+    updatedImages.splice(index, 0, movedImage);
+
+    setImageList(updatedImages);
+  };
 
   return (
     <div className="registermain">
+      
       <Col lg="12" md="12">
+      <div>
+        {imageList.map((image, index) => (
+          <div
+            key={index}
+            draggable
+            onDragStart={handleDragStart(index)}
+            onDragOver={handleDragOver(index)}
+            onDrop={handleDrop(index)}
+          >
+            <img src={image} alt={`mage ${index}`} />
+          </div>
+        ))}
+      </div>
         <Card className="bg-secondary shadow border-0">
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
@@ -112,7 +153,7 @@ const Upload = ({ direction, ...args }) => {
             </div>
 
             <Form role="form">
-              <FormGroup>
+              {/* <FormGroup>
                 <Button
                   className="uploadbut mt-4"
                   color="primary"
@@ -130,9 +171,9 @@ const Upload = ({ direction, ...args }) => {
                     ></i>
                   </span>
                 </Button>
-              </FormGroup>
+              </FormGroup> */}
 
-              {showKYC && (
+              {/* {showKYC && (
                 <>
                   <FormGroup>
                     <Label style={{ color: "gray" }}>Upload Addhaar Card</Label>
@@ -142,7 +183,7 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="aadharFile"
-                        onChange={(e) => handleDocUpload(e, "adr")}
+                        onChange={(e) => handleDocUploads(e, "adr")}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -155,12 +196,12 @@ const Upload = ({ direction, ...args }) => {
                         placeholder=""
                         type="file"
                         name="panfile"
-                        onChange={(e) => handleDocUpload(e, "pan")}
+                        onChange={(e) => handleDocUploads(e, "pan")}
                       />
                     </InputGroup>
                   </FormGroup>
                 </>
-              )}
+              )} */}
               <FormGroup>
                 <Button
                   className=" uploadbut mt-4"
@@ -182,42 +223,39 @@ const Upload = ({ direction, ...args }) => {
               </FormGroup>
               {showITR && (
                 <>
-                  <FormGroup>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>AY First Year</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="ayfistYear"
-                        onChange={(e) => handleDocUpload(e, "ayfirst")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="ayfistYear"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "ayfirst")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>AY Second Year</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="aysecondYear"
-                        onChange={(e) => handleDocUpload(e, "aysecond")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="aysecondYear"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "aysecond")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>AY Third Year</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="aythirdYear"
-                        onChange={(e) => handleDocUpload(e, "aythird")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="aythirdYear"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "aythird")}
+                    />
+                  </div>
                 </>
               )}
               <FormGroup>
@@ -242,66 +280,61 @@ const Upload = ({ direction, ...args }) => {
 
               {otherdoc && (
                 <>
-                  <FormGroup>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>Loan Scheduler</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="loanSchedule"
-                        onChange={(e) => handleDocUpload(e, "loan")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="loanSchedule"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "loan")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>Property Papers</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="propertyPapers"
-                        onChange={(e) => handleDocUpload(e, "propaper")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="propertyPapers"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "propaper")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>Banking</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="banking"
-                        onChange={(e) => handleDocUpload(e, "banking")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="banking"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "banking")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>Salary Slip</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="salarySlip"
-                        onChange={(e) => handleDocUpload(e, "salary")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="salarySlip"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "salary")}
+                    />
+                  </div>
+                  <div className="mb-3 shadow-sm">
+                    {" "}
                     <Label style={{ color: "gray" }}>Form - 16</Label>
-                    <InputGroup className="input-group-alternative mb-3 d-flex justify-content-between align-items-center">
-                      <Input
-                        className="col-8"
-                        placeholder=""
-                        type="file"
-                        name="form16"
-                        onChange={(e) => handleDocUpload(e, "form16")}
-                      />
-                    </InputGroup>
-                  </FormGroup>
+                    <input
+                      className="fileinput"
+                      type="file"
+                      name="form16"
+                      multiple
+                      onChange={(e) => handleDocUploads(e, "form16")}
+                    />
+                  </div>
                 </>
               )}
 

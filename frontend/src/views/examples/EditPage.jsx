@@ -1,3 +1,4 @@
+import { toggleLoading } from "features/loading/loadingSlice";
 import { getallnotification } from "features/loan/loanSlice";
 import { getallCustomerData } from "features/loan/loanSlice";
 import React, { useState } from "react";
@@ -5,8 +6,9 @@ import { MdDelete } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 import { Input } from "reactstrap";
+import { uploadDoc } from "utils/api";
 import { updateCustomer } from "utils/api";
 const EditPage = () => {
   const data = useSelector((st) => st.view.data);
@@ -93,6 +95,31 @@ const EditPage = () => {
       toast.error(error.response.data.error);
     }
   };
+   const handlecarPolicy = async (e,i) => {
+    dispatch(toggleLoading(true))
+    const url = await uploadDoc(e.target.files[0])
+    let updatedCardetails = [...formdata.cardetails];
+    updatedCardetails[i] = {
+      ...updatedCardetails[i],
+      policy: url,
+    };
+    setformdata({
+      ...formdata,
+      cardetails: updatedCardetails,
+    });
+    dispatch(toggleLoading(false))
+    
+  };
+  // const handledocUplods =async(e,i,f)=>{
+  //   switch (f) {
+  //     case "adr":
+        
+  //       break;
+    
+  //     default:
+  //       break;
+  //   }
+  // }
   return (
     <>
       {formdata._id && (
@@ -395,6 +422,7 @@ const EditPage = () => {
                       }}
                     />
                   </div>
+                  
                 </div>
               ))}
               {/* firmdetails deatils columns */}
@@ -690,21 +718,10 @@ const EditPage = () => {
                   <div className="col-6 col-md-4 mb-2">
                     <label className="mb-0"> Policy :</label>
                     <input
-                      type="text"
+                      type="file"
                       placeholder="Enter Policy"
-                      className="form-control"
-                      value={formdata.cardetails[i].policy}
-                      onChange={(e) => {
-                        let updatedCardetails = [...formdata.cardetails];
-                        updatedCardetails[i] = {
-                          ...updatedCardetails[i],
-                          policy: e.target.value,
-                        };
-                        setformdata({
-                          ...formdata,
-                          cardetails: updatedCardetails,
-                        });
-                      }}
+                      className="fileinput"
+                      onChange={(e) => {handlecarPolicy(e,i)}}
                     />
                   </div>
                   <p style={buttonStyle} onClick={() => handleCardelte(i)}>

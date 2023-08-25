@@ -86,6 +86,7 @@ const getCustomerData = asyncHandle(async (req, res) => {
   } else {
     res.json(data);
   }
+  // res.send(cus)
 });
 
 const AssignCustomer = asyncHandle(async (req, res) => {

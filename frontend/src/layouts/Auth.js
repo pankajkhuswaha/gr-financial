@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import "./index.css";
-import { Container, Row, Col } from "reactstrap";
+import { Container, Row } from "reactstrap";
 
 // core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
@@ -13,10 +13,13 @@ import { ToastContainer } from "react-toastify";
 import OtpVerify from "../views/authentication/OtpVerify";
 import Forgot from "views/authentication/Forgot";
 import LinkSucess from "views/authentication/LinkSucess";
+import Loading from "./Loading";
+import { useSelector } from "react-redux";
 
 const Auth = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
+  const loading = useSelector((st=>st.loading)).show
 
   React.useEffect(() => {
     document.body.classList.add("bg-default");
@@ -56,6 +59,7 @@ const Auth = (props) => {
         pauseOnHover
         theme="light"
       />
+      {loading && <Loading/>}
       <div className="main-content" ref={mainContent}>
         <AuthNavbar />
         <div className=" header bg-gradient-info py-7 py-lg-8">

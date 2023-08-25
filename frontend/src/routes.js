@@ -1,12 +1,13 @@
 
 import Index from "views/Index.js";
 import Register from "views/examples/Register.js";
-import Login from "views/examples/Login.js";
+import Login from "views/examples/Login.jsx";
 import Upload from "views/examples/Upload";
 import Firm from "views/examples/Firm";
 import Company from "views/examples/Company";
 import Assetsdetails from "views/examples/Assetsdetails";
 import Next from "views/examples/Next";
+import AddCustomerDetails from "views/examples/AddCustomerDetails";
 
 var routes = [
   {
@@ -64,6 +65,13 @@ var routes = [
     name: "Add Company",
     icon: "ni ni-bullet-list-67 text-red",
     component: <Company />,
+    layout: "/auth",
+  },
+  {
+    path: "/add-customer-detail",
+    name: "Add Company",
+    icon: "ni ni-bullet-list-67 text-red",
+    component: <AddCustomerDetails />,
     layout: "/auth",
   },
   {

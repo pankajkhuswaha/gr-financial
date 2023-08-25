@@ -3,17 +3,15 @@ import { FiEye } from "react-icons/fi";
 import { useSelector } from "react-redux";
 
 const ViewPage = () => {
-
   const data = useSelector((st) => st.view.data);
-
-  const [doc, setdoc] = useState([])
-  const [docs, setdocs] = useState([])
-  useEffect(()=>{
-      if(data.documents[0]){
-        setdoc(Object.values(data.documents[0]))
-        setdocs(Object.keys(data.documents[0]))
-      }
-  },[data.documents])
+  const [doc, setdoc] = useState([]);
+  const [docs, setdocs] = useState([]);
+  useEffect(() => {
+    if (data.documents[0]) {
+      setdoc(Object.values(data.documents[0]));
+      setdocs(Object.keys(data.documents[0]));
+    }
+  }, [data.documents]);
   return (
     <>
       <div className="col-12 d-flex align-items-center justify-content-center mt-5">
@@ -88,6 +86,198 @@ const ViewPage = () => {
                   <li>
                     <span>Father Name:</span> {it.father}
                   </li>
+                  {it.adhaarcard && (
+                    <li>
+                      <span>Adhaar card:</span>{" "}
+                      <a
+                        href={it.adhaarcard}
+                        target="blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FiEye
+                          style={{ cursor: "pointer" }}
+                          color="blue"
+                          fontSize={20}
+                        />
+                      </a>
+                    </li>
+                  )}
+                  {it.panCard && (
+                    <li>
+                      <span>Pan card:</span>{" "}
+                      <a
+                        href={it.panCard}
+                        target="blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FiEye
+                          style={{ cursor: "pointer" }}
+                          color="blue"
+                          fontSize={20}
+                        />
+                      </a>
+                    </li>
+                  )}
+                  {it.salarySlip && (
+                    <li>
+                      <span>Salary Slip:</span>{" "}
+                      <a
+                        href={
+                          it.salarySlip
+                            ? it.salarySlip
+                            : "https://grfinancial.in/admin/index"
+                        }
+                        target="blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FiEye
+                          style={{ cursor: "pointer" }}
+                          color="blue"
+                          fontSize={20}
+                        />
+                      </a>
+                    </li>
+                  )}
+                  {it.AY_First_Year.length !== 0 && (
+                    <li>
+                      <span>Ay First Year:</span>{" "}
+                      {it.AY_First_Year?.map((e, i) => (
+                        <a
+                          className="mx-2"
+                          href={it.AY_First_Year[i]}
+                          target="blank"
+                          key={i}
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.AY_Second_Year.length !== 0 && (
+                    <li>
+                      <span>AY Second Year:</span>{" "}
+                      {it.AY_Second_Year?.map((e, i) => (
+                        <a
+                          className="mx-2"
+                          href={it.AY_Second_Year[i]}
+                          target="blank"
+                          key={i}
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.AY_Third_Year.length !== 0 && (
+                    <li>
+                      <span>AY Third Year:</span>{" "}
+                      {it.AY_Third_Year?.map((e, i) => (
+                        <a
+                          key={i}
+                          className="mx-2"
+                          href={it.AY_Third_Year[i]}
+                          target="blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.Banking.length !== 0 && (
+                    <li>
+                      <span>Banking:</span>{" "}
+                      {it.Banking?.map((e, i) => (
+                        <a
+                          key={i}
+                          className="mx-2"
+                          href={it.Banking[i]}
+                          target="blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.Form_16.length !== 0 && (
+                    <li>
+                      <span>Form_16:</span>{" "}
+                      {it.Form_16?.map((e, i) => (
+                        <a
+                          key={i}
+                          className="mx-2"
+                          href={it.Form_16[i]}
+                          target="blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.Loan_Schedule.length !== 0 && (
+                    <li>
+                      <span>Loan_Schedule:</span>{" "}
+                      {it.Loan_Schedule?.map((e, i) => (
+                        <a
+                          key={i}
+                          className="mx-2"
+                          href={it.Loan_Schedule[i]}
+                          target="blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
+                  {it.Property_Papers.length !== 0 && (
+                    <li>
+                      <span>Property_Papers:</span>{" "}
+                      {it.Property_Papers?.map((e, i) => (
+                        <a
+                          key={i}
+                          className="mx-2"
+                          href={it.Property_Papers[i]}
+                          target="blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FiEye
+                            style={{ cursor: "pointer" }}
+                            color="blue"
+                            fontSize={20}
+                          />
+                        </a>
+                      ))}
+                    </li>
+                  )}
                 </ul>
               </div>
             ))}
@@ -112,7 +302,18 @@ const ViewPage = () => {
                       <span>Car Type:</span> {it.insuredBy}
                     </li>
                     <li>
-                      <span>Policy :</span> <a href={it.policy|| "https://grfinancial.in/admin/index"} target="blank" rel="noopener noreferrer"><FiEye style={{cursor:"pointer"}} color="blue" fontSize={20}/></a>
+                      <span>Policy :</span>{" "}
+                      <a
+                        href={it.policy || "https://grfinancial.in/admin/index"}
+                        target="blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FiEye
+                          style={{ cursor: "pointer" }}
+                          color="blue"
+                          fontSize={20}
+                        />
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -154,16 +355,28 @@ const ViewPage = () => {
             <p className="col-12"> Provident Fund : {data.providentfund}rs</p>
             <p className="col-12"> Cash in Hand: {data.cashinhand}</p>
           </div>
-          <div>
+          {data?.persondetails?.Loan_Schedule && <div>
             <h3>Documents </h3>
-            {docs.map((ele,i)=>{
-              return <div key={i} className="d-flex justify-content-between"> 
-                <h5>{ele} : </h5>
-                <a href={doc[i]|| "https://grfinancial.in/admin/index"} target="blank" rel="noopener noreferrer"><FiEye style={{cursor:"pointer"}} color="blue" fontSize={20}/></a>
-                {/* <p>{doc[i]}</p> */}
-              </div>
+            {docs.map((ele, i) => {
+              return (
+                <div key={i} className="d-flex justify-content-between">
+                  <h5>{ele} : </h5>
+                  <a
+                    href={doc[i] || "https://grfinancial.in/admin/index"}
+                    target="blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FiEye
+                      style={{ cursor: "pointer" }}
+                      color="blue"
+                      fontSize={20}
+                    />
+                  </a>
+                  {/* <p>{doc[i]}</p> */}
+                </div>
+              );
             })}
-          </div>
+          </div>}
         </div>
       </div>
     </>
