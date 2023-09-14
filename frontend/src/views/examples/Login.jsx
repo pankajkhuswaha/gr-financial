@@ -40,6 +40,21 @@ const Login = () => {
       toast.error(error.message);
     }
   };
+  function generateUniqueCode() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();
+    const uniqueCode = `${hours}${minutes}${seconds}${milliseconds}`;  
+    return uniqueCode.padStart(4, '0');
+  }
+  
+  // Example usage:
+  const uniqueCode = generateUniqueCode();
+  console.log(uniqueCode);
+  
+
   return (
     <>
       <ToastContainer

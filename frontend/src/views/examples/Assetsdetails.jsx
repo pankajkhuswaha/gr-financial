@@ -24,6 +24,7 @@ import { toggleLoading } from "features/loading/loadingSlice";
 import { addCustomer } from "utils/api";
 import { resetData } from "features/loan/loanSlice";
 
+
 const Assetsdetails = ({ direction, ...args }) => {
   const [propertyOption, setPropertyOption] = useState("");
   const [carOption, setCarOption] = useState("");
@@ -63,7 +64,7 @@ const Assetsdetails = ({ direction, ...args }) => {
       dispatch(toggleLoading(true))
       try {
         const res = await addCustomer(merge);
-        // dispatch(resetData());
+        dispatch(resetData());
         navigate("/admin/index");
         toast.success(res.data);
       } catch (error) {

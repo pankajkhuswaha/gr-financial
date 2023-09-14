@@ -48,7 +48,9 @@ const isAdminuser = asyncHandler(async (req, res) => {
 const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
+  const user = await User.find()
   const findUser = await User.findOne({ email });
+  console.log(user)
   console.log(findUser!==null)
   
   if(findUser!==null){

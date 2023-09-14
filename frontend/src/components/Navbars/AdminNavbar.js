@@ -35,7 +35,7 @@ const AdminNavbar = (props) => {
   const [reminder, setsetting] = useState([]);
   const dispatch = useDispatch();
   const pathname = useLocation().pathname;
-  const atviews = pathname.includes("edit") || pathname.includes("view");
+  const atviews = pathname.includes("edit") || pathname.includes("view")||pathname.includes("doc");
   const [atview, setAtview] = useState(atviews);
   useEffect(() => {
     setsetting(nofictaion);

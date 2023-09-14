@@ -20,6 +20,7 @@ import { verifyUserLogin } from "utils/api";
 import { useDispatch, useSelector } from "react-redux";
 import { getallnotification } from "features/loan/loanSlice";
 import Loading from "./Loading";
+import DocViewer from "views/examples/DocViewer";
 
 const Admin = (props) => {
   const mainContent = React.useRef(null);
@@ -106,6 +107,7 @@ const Admin = (props) => {
           <Route path="*" element={<Navigate to="/admin/index" replace />} />
           <Route path="/view" element={<ViewPage />} />
           <Route path="/edit" element={<EditPage />} />
+          <Route path="/doc" element={<DocViewer />} />
         </Routes>
         <Container fluid>
           <AdminFooter />

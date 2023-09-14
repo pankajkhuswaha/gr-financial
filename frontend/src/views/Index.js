@@ -28,6 +28,7 @@ import { deleteCustomer } from "utils/api";
 import { getallUserAcess } from "features/loan/loanSlice";
 import { assignCustomers } from "utils/api";
 import { getallnotification } from "features/loan/loanSlice";
+// import TableComponent from './TableComponent';
 
 const Index = ({ direction, ...args }) => {
   const [show, setShow] = useState(false);
@@ -300,6 +301,7 @@ const Index = ({ direction, ...args }) => {
           </Card>
         </Row>
       </Container>
+      {/* <TableComponent/> */}
     </>
   );
 };

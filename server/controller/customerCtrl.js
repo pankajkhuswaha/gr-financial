@@ -3,10 +3,23 @@ const Customer = require("../models/CustomerModel");
 const User = require("../models/userModel");
 const addCustomer = asyncHandle(async (req, res) => {
   const cus = await Customer.find();
+  function generateUniqueCode() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();  
+    const uniqueCode = `${hours}${minutes}${seconds}${milliseconds}`;  
+    return uniqueCode.padStart(4, '0');
+  }
+  
+  const uniqueCode = generateUniqueCode();
+  console.log(uniqueCode);
+  
   const data = {
     customertype: req.body.loantype,
     handleby:req.user.name,
-    customerid: `GRF00${cus?.length + 1 || 1}`,
+    customerid: `GRF${uniqueCode}`,
     persondetails: req.body.persondetails,
     ref1: req.body.reference.firstreferance,
     ref2: req.body.reference.secondreference,
